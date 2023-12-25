@@ -4,3 +4,6 @@
 #define ALLOCFAILURE 2
 #define REALLOCFAILURE 3
 #define ARGBADRANGE 4
+#define INDEXOUTOFRANGE 5
+
+typedef int (*predicate)(void*,void*);

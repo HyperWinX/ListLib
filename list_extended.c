@@ -30,16 +30,15 @@ int list_get(struct list* list, void* element, int index){
         memcpy(element, list->ptr + (index * list->elementsize), list->elementsize);
 }                                                 
 int list_set(struct list* list, void* element, int index){
-        if (index < 0 || index > list->elementcoun
-t - 1)                                                            return INDEXOUTOFRANGE;
-        memcpy(list->ptr + (index * list-
->elementsize), element, list->elementsize);       }
+        if (index < 0 || index > list->elementcount - 1)                                                            return INDEXOUTOFRANGE;
+        memcpy(list->ptr + (index * list->elementsize), element, list->elementsize);
+}
 
 //Extended functionality
 
 int list_add(struct list* list, void* element){
 	if (list->elementcount > 0){
-		ptr = realloc(list->ptr, list->allocated + list->elementsize);
+		void* ptr = realloc(list->ptr, list->allocated + list->elementsize);
 		if (!ptr) return REALLOCFAILURE;
 		list->ptr = ptr;
 		list->allocated += list->elementsize;
@@ -80,32 +79,79 @@ int list_clear(struct list* list){
 int list_contains(struct list* list, void* element){
 	for (int i = 0; i < list->elementcount; i++)
 		if (!memcmp(list->ptr + (list->elementsize * i), element, list->elementsize)) return 0;
-	return 1;
+	return ITEMNOTFOUND;
 }
 
-int list_find(struct list* list, void* elementtofind, int (*comparer)(void*,void*)){
+int list_exists(struct list* list, predicate comparer, void* elementtofind){
+	for (int i = 0; i < list->elementcount; i++){
+		int retcode = comparer(list->ptr + (list->elementsize * i), elementtofind);
+		if (!retcode) return retcode;
+	}
+	return ITEMNOTFOUND;
+}
+
+int list_find(struct list* list, void* elementtofind, predicate comparer, void* item){
 	for (int i = 0; i < list->elementcount; i++)
-		if (!(*comparer)(list->ptr + (list->elementsize * i), elementtofind)){
+		if (!comparer(list->ptr + (list->elementsize * i), elementtofind)){
 			memcpy(item, list->ptr + (list->elementsize * i), list->elementsize);
 			return NOERR;
 		}
 	return ITEMNOTFOUND;
 }
 
-int list_findindex(struct list* list, int startindex, int endindex, int (*comparer)(void*,void*), void* elementtofind){
+int list_findindex(struct list* list, int startindex, int endindex, predicate comparer, void* elementtofind){
 	int end = (endindex > list->elementcount - 1 ? list->elementcount : endindex);
 	if (startindex > list->elementcount - 1 ||
 	    startindex < 0 ||
 	    startindex > endindex) return ARGBADRANGE;
 	for(int i = startindex; i < end; i++)
-		if (!(*comparer)(list->ptr + (list->elementsize * i), elementtofind)) return i;
+		if (!comparer(list->ptr + (list->elementsize * i), elementtofind)) return i;
 	return ITEMNOTFOUND;
 }
 
-int list_findindex(struct list* list, int startindex, int (*comparer)(void*,void*), void* elementtofind){
+int list_findindex(struct list* list, int startindex, predicate comparer, void* elementtofind){
 	if (startindex > list->elementcount - 1 ||
 	    startindex < 0) return ARGBADRANGE;
 	for (int i = startindex; i < list->elementcount; i++)
-		if(!(*comparer)(list->ptr + (list->elementsize * i), elementtofind)) return i;
+		if(!comparer(list->ptr + (list->elementsize * i), elementtofind)) return i;
 	return ITEMNOTFOUND;
 }
+
+int list_findindex(struct list* list, int predicate comparer){
+	for (int i = 0; i < list->elementcount; i+++)
+		if (!comparer(list->ptr + (list->elementsize * i))) return i;
+	return ITEMNOTFOUND;
+}
+
+int list_findlast(struct list* list, void* elementtofind, void* item, predicate comparer){
+	for (int i = list->elementcount - 1; i >= 0; i--)
+		if (!comparer(list->ptr + (list->elementsize * i), elementtofind)){
+			memcpy(item, list->ptr + (list->elementsize * i), list->elementsize);
+			return NOERR;
+		}
+	return ITEMNOTFOUND;
+}
+
+int list_findlastindex(struct list* list, int startindex, int endindex, predicate comparer, void* elementtofind){
+	int end = (endindex > list->elementcount - 1 ? list->elementcount : endindex);
+	if (startindex > list->elementcount - 1 ||
+	    startindex < 0 ||
+	    startindex > endindex) return ARGBADRANGE;
+	for(int i = startindex; i < end; i++)
+		if (!comparer(list->ptr + (list->elementsize * i), elementtofind)) return i;
+	return ITEMNOTFOUND;
+}
+
+int list_findlastindex(struct list* list, int startindex, predicate comparer, void* elementtofind){
+	if (startindex > list->elementcount - 1 ||
+	    startindex < 0) return ARGBADRANGE;
+	for (int i = startindex; i < list->elementcount; i++)
+		if(!comparer(list->ptr + (list->elementsize * i), elementtofind)) return i;
+	return ITEMNOTFOUND;
+}
+
+int list_findindex(struct list* list, predicate comparer){
+	for (int i = 0; i < list->elementcount; i+++)
+		if (!comparer(list->ptr + (list->elementsize * i))) return i;
+	return ITEMNOTFOUND;
+} 
