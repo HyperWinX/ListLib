@@ -1,6 +1,6 @@
 #include <stdint.h>
 #include <stdlib.h>
-#include "list.h"
+#include "list_extended.h"
 
 struct list{
 	void* ptr;
@@ -83,4 +83,29 @@ int list_contains(struct list* list, void* element){
 	return 1;
 }
 
+int list_find(struct list* list, void* elementtofind, int (*comparer)(void*,void*)){
+	for (int i = 0; i < list->elementcount; i++)
+		if (!(*comparer)(list->ptr + (list->elementsize * i), elementtofind)){
+			memcpy(item, list->ptr + (list->elementsize * i), list->elementsize);
+			return NOERR;
+		}
+	return ITEMNOTFOUND;
+}
 
+int list_findindex(struct list* list, int startindex, int endindex, int (*comparer)(void*,void*), void* elementtofind){
+	int end = (endindex > list->elementcount - 1 ? list->elementcount : endindex);
+	if (startindex > list->elementcount - 1 ||
+	    startindex < 0 ||
+	    startindex > endindex) return ARGBADRANGE;
+	for(int i = startindex; i < end; i++)
+		if (!(*comparer)(list->ptr + (list->elementsize * i), elementtofind)) return i;
+	return ITEMNOTFOUND;
+}
+
+int list_findindex(struct list* list, int startindex, int (*comparer)(void*,void*), void* elementtofind){
+	if (startindex > list->elementcount - 1 ||
+	    startindex < 0) return ARGBADRANGE;
+	for (int i = startindex; i < list->elementcount; i++)
+		if(!(*comparer)(list->ptr + (list->elementsize * i), elementtofind)) return i;
+	return ITEMNOTFOUND;
+}
