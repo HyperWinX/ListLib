@@ -4,11 +4,12 @@
 #include "list.h"
 #include "tests/tests.h"
 
-char* test_strings = {
+
+char* test_strings[] = {
     "List initialization...              ",
     "List destroy...                     ",
-    "List value get...                   ",
     "List value set...                   ",
+    "List value get...                   ",
     "List add value...                   ",
     "List addrange1...                   ",
     "List addrange2...                   ",
@@ -40,14 +41,15 @@ char* test_strings = {
 test positive_tests[] = {
     test_list_init,
     test_list_destroy,
-    test_list_get,
     test_list_set,
+    test_list_get,
     test_list_add,
     test_list_addrange1,
     test_list_addrange2,
     test_list_clear,
     test_list_contains,
     test_list_exists,
+    test_list_find,
     test_list_findindex1,
     test_list_findindex2,
     test_list_findindex3,

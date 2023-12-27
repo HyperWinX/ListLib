@@ -1,7 +1,7 @@
 shared:
 	gcc -c -Wall -Werror -fpic list.c -o list.o
 	gcc -shared -o list.so list.o
-tests:
-	@gcc tests.c list.c -O2 -march=native -o tests
-	-@./tests
-	@rm -f tests
+test:
+	@gcc tests.c list.c tests/positive_tests.c -o testsexec
+	-@./testsexec
+	@rm -f testsexec

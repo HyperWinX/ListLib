@@ -7,7 +7,7 @@
 //Basic actions
 
 int list_init(struct list* list, size_t initial_count, size_t elementsize){
-	if (!initial_size) return NULLINITSIZE;
+	if (!initial_count) return NULLINITSIZE;
 	if (!elementsize) return NULLINITSIZE;
 	if (!list) return NULLPTR;
 	void* ptr = calloc(elementsize * initial_count, 1);
@@ -39,6 +39,7 @@ int list_destroy(struct list* list){
 	if (!list) return NULLPTR;
 	free(list->ptr);
 	memset(list, 0x00, sizeof(struct list));
+	return NOERR;
 }
 
 //Extended functionality
@@ -79,12 +80,8 @@ int list_addrange2(struct list* list, struct list* src){
 
 int list_clear(struct list* list){
 	if (!list) return NULLPTR;
-	void* ptr = realloc(list->ptr, list->elementsize);
-	if (!ptr) return REALLOCFAILURE;
-	list->ptr = ptr;
 	list->elementcount = 0;
 	list->listsz = 0;
-	list->allocated = list->elementsize;
 	return NOERR;
 }
 
@@ -142,7 +139,7 @@ uint32_t list_findindex2(struct list* list, uint32_t startindex, predicate compa
 	return 0;
 }
 
-uint32_t list_findindex3(struct list* list, void* elementtofind, predicate comparer){
+uint32_t list_findindex3(struct list* list, predicate comparer, void* elementtofind){
 	if (!list) return NULLPTR;
 	for (uint32_t i = 0; i < list->elementcount; i++)
 		if (!comparer(list->ptr + (list->elementsize * i), elementtofind)) return i;
@@ -188,7 +185,7 @@ uint32_t list_findlastindex2(struct list* list, uint32_t startindex, predicate c
 	return 0;
 }
 
-uint32_t list_findlastindex3(struct list* list, void* elementtofind, predicate comparer){
+uint32_t list_findlastindex3(struct list* list, predicate comparer,  void* elementtofind){
 	if (!list) return NULLPTR;
 	for (uint32_t i = list->elementsize - 1; i >= 0; i--)
 		if (!comparer(list->ptr + (list->elementsize * i), elementtofind)) return i;
@@ -196,10 +193,11 @@ uint32_t list_findlastindex3(struct list* list, void* elementtofind, predicate c
 	return 0;
 } 
 
-void list_foreach(struct list* list, void (*action)(void*)){
+int list_foreach(struct list* list, void (*action)(void*)){
 	if (!list) return NULLPTR;
 	for (int i = 0; i < list->elementcount; i++)
 		(*action)(list->ptr + (list->elementsize * i));
+	return NOERR;
 }
 
 uint32_t list_indexof1(struct list* list, void* elementtofind){
