@@ -6,11 +6,11 @@
 
 //Basic actions
 
-int list_init(struct list* list, size_t initial_size, size_t elementsize){
+int list_init(struct list* list, size_t initial_count, size_t elementsize){
 	if (!initial_size) return NULLINITSIZE;
 	if (!elementsize) return NULLINITSIZE;
 	if (!list) return NULLPTR;
-	void* ptr = calloc(elementsize * initial_size, 1);
+	void* ptr = calloc(elementsize * initial_count, 1);
 	if (!ptr) return ALLOCFAILURE;
 	list->ptr = ptr;
 	list->elementsize = elementsize;
@@ -45,11 +45,11 @@ int list_destroy(struct list* list){
 
 int list_add(struct list* list, void* element){
 	if (!list) return NULLPTR;
-	if (list->elementcount > 0){
-		void* ptr = realloc(list->ptr, list->allocated + list->elementsize);
+	if (list->listsz == list->allocated){
+		void* ptr = realloc(list->ptr, list->allocated + list->elementsize*4);
 		if (!ptr) return REALLOCFAILURE;
 		list->ptr = ptr;
-		list->allocated += list->elementsize;
+		list->allocated += list->elementsize*4;
 	}
 	memcpy(list->ptr + (list->elementsize * list->elementcount), element, list->elementsize);
 	list->elementcount++;

@@ -17,7 +17,7 @@ struct list{
 
 typedef int (*predicate)(void*,void*);
 
-int list_init(struct list* list, size_t initial_size, size_t elementsize);
+int list_init(struct list* list, size_t initial_count, size_t elementsize);
 int list_get(struct list* list, void* element, int index);
 int list_set(struct list* list, void* element, int index);
 void list_destroy(struct list* list);
