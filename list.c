@@ -22,14 +22,16 @@ int list_init(struct list* list, size_t initial_count, size_t elementsize){
 
 int list_get(struct list* list, void* element, int index){
 		if (!list) return NULLPTR;
-        if (index < 0 || index > list->elementcount - 1)
+		if (!element) return NULLPTR;
+        if (index < 0 || index > (list->elementcount == 0 ? 0 : list->elementcount - 1))
                 return INDEXOUTOFRANGE;
         memcpy(element, list->ptr + (index * list->elementsize), list->elementsize);
 		return NOERR;
 }                                                 
 int list_set(struct list* list, void* element, int index){
 		if (!list) return NULLPTR;
-        if (index < 0 || index > list->elementcount - 1)
+		if (!element) return NULLPTR;
+        if (index < 0 || index > (list->elementcount == 0 ? 0 : list->elementcount - 1))
 			return INDEXOUTOFRANGE;
         memcpy(list->ptr + (index * list->elementsize), element, list->elementsize);
 		return NOERR;
@@ -46,6 +48,7 @@ int list_destroy(struct list* list){
 
 int list_add(struct list* list, void* element){
 	if (!list) return NULLPTR;
+	if (!element) return NULLPTR;
 	if (list->listsz == list->allocated){
 		void* ptr = realloc(list->ptr, list->allocated + list->elementsize*4);
 		if (!ptr) return REALLOCFAILURE;
@@ -60,6 +63,8 @@ int list_add(struct list* list, void* element){
 
 int list_addrange1(struct list* list, void* array, int count){
 	if (!list) return NULLPTR;
+	if (!array) return NULLPTR;
+	if (!count) return ARGBADRANGE;
 	int retcode = 0;
 	for (uint32_t i = 0; i < count; i++){
 		retcode = list_add(list, array + (list->elementsize * i));
@@ -70,6 +75,7 @@ int list_addrange1(struct list* list, void* array, int count){
 
 int list_addrange2(struct list* list, struct list* src){
 	if (!list) return NULLPTR;
+	if (!src) return NULLPTR;
 	int retcode = 0;
 	for (uint32_t i = 0; i < src->elementcount; i++){
 		retcode = list_add(list, src->ptr + (list->elementsize * i));
@@ -87,6 +93,7 @@ int list_clear(struct list* list){
 
 signed int list_contains(struct list* list, void* element){
 	if (!list) return NULLPTR;
+	if (!element) return NULLPTR;
 	for (uint32_t i = 0; i < list->elementcount; i++)
 		if (!memcmp(list->ptr + (list->elementsize * i), element, list->elementsize)) return 0;
 	return ITEMNOTFOUND;
@@ -94,6 +101,8 @@ signed int list_contains(struct list* list, void* element){
 
 signed int list_exists(struct list* list, predicate comparer, void* elementtofind){
 	if (!list) return NULLPTR;
+	if (!comparer) return NULLPTR;
+	if (!elementtofind) return NULLPTR;
 	for (uint32_t i = 0; i < list->elementcount; i++){
 		int retcode = comparer(list->ptr + (list->elementsize * i), elementtofind);
 		if (!retcode) return retcode;
@@ -103,6 +112,9 @@ signed int list_exists(struct list* list, predicate comparer, void* elementtofin
 
 signed int list_find(struct list* list, void* elementtofind, predicate comparer, void* item){
 	if (!list) return NULLPTR;
+	if (!elementtofind) return NULLPTR;
+	if (!comparer) return NULLPTR;
+	if (!item) return NULLPTR;
 	for (uint32_t i = 0; i < list->elementcount; i++)
 		if (!comparer(list->ptr + (list->elementsize * i), elementtofind)){
 			memcpy(item, list->ptr + (list->elementsize * i), list->elementsize);
@@ -113,6 +125,8 @@ signed int list_find(struct list* list, void* elementtofind, predicate comparer,
 
 uint32_t list_findindex1(struct list* list, uint32_t startindex, uint32_t endindex, predicate comparer, void* elementtofind){
 	if (!list) return NULLPTR;
+	if (!comparer) return NULLPTR;
+	if (!elementtofind) return NULLPTR;
 	uint32_t end = (endindex > list->elementcount - 1 ? list->elementcount : endindex);
 	if (startindex > list->elementcount - 1 ||
 	    startindex < 0 ||
