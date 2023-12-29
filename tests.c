@@ -89,6 +89,7 @@ void run_positive_tests(void){
         retcode = positive_tests[i]();
         DEBUG
     }
+    printf(ANSI_COLOR_GREEN "All positive tests completed successfully!\n" ANSI_COLOR_RESET);
 }
 
 int main(){

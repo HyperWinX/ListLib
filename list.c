@@ -149,7 +149,7 @@ uint32_t list_findindex3(struct list* list, predicate comparer, void* elementtof
 
 signed int list_findlast(struct list* list, void* elementtofind, void* item, predicate comparer){
 	if (!list) return NULLPTR;
-	for (int i = list->elementcount - 1; i >= 0; i--)
+	for (int i = list->elementcount; i >= 0; i--)
 		if (!comparer(list->ptr + (list->elementsize * i), elementtofind)){
 			memcpy(item, list->ptr + (list->elementsize * i), list->elementsize);
 			return NOERR;
@@ -157,7 +157,7 @@ signed int list_findlast(struct list* list, void* elementtofind, void* item, pre
 	return ITEMNOTFOUND;
 }
 
-uint32_t list_findlastindex1(struct list* list, uint32_t startindex, uint32_t endindex, predicate comparer, void* elementtofind, void* item){
+uint32_t list_findlastindex1(struct list* list, uint32_t startindex, uint32_t endindex, predicate comparer, void* elementtofind){
 	if (!list) return NULLPTR;
 	uint32_t end = (endindex > list->elementcount - 1 ? list->elementcount : endindex);
 	if (startindex > list->elementcount - 1 ||
@@ -172,7 +172,7 @@ uint32_t list_findlastindex1(struct list* list, uint32_t startindex, uint32_t en
 	return -1;
 }
 
-uint32_t list_findlastindex2(struct list* list, uint32_t startindex, predicate comparer, void* elementtofind, void* item){
+uint32_t list_findlastindex2(struct list* list, uint32_t startindex, predicate comparer, void* elementtofind){
 	if (!list) return NULLPTR;
 	if (startindex > list->elementcount - 1 ||
 	    startindex < 0){
@@ -187,7 +187,7 @@ uint32_t list_findlastindex2(struct list* list, uint32_t startindex, predicate c
 
 uint32_t list_findlastindex3(struct list* list, predicate comparer,  void* elementtofind){
 	if (!list) return NULLPTR;
-	for (uint32_t i = list->elementsize - 1; i >= 0; i--)
+	for (uint32_t i = list->elementcount - 1; i >= 0; i--)
 		if (!comparer(list->ptr + (list->elementsize * i), elementtofind)) return i;
 	errno = ITEMNOTFOUND;
 	return 0;
@@ -201,7 +201,10 @@ int list_foreach(struct list* list, void (*action)(void*)){
 }
 
 uint32_t list_indexof1(struct list* list, void* elementtofind){
-	if (!list) return NULLPTR;
+	if (!list){
+		errno = NULLPTR;
+		return 0;
+	}
 	for (uint32_t i = 0; i < list->elementcount; i++)
 		if (!memcmp(elementtofind, list->ptr + (list->elementsize * i), list->elementsize))
 			return i;
@@ -210,7 +213,10 @@ uint32_t list_indexof1(struct list* list, void* elementtofind){
 }
 
 uint32_t list_indexof2(struct list* list, void* elementtofind, uint32_t startindex){
-	if (!list) return NULLPTR;
+	if (!list){
+		errno = NULLPTR;
+		return 0;
+	}
 	if (startindex > list->elementcount - 1 ||
 	    startindex < 0){
 			errno = ARGBADRANGE;
@@ -224,7 +230,10 @@ uint32_t list_indexof2(struct list* list, void* elementtofind, uint32_t startind
 }
 
 uint32_t list_indexof3(struct list* list, void* elementtofind, uint32_t startindex, uint32_t endindex){
-	if (!list) return NULLPTR;
+	if (!list){
+		errno = NULLPTR;
+		return 0;
+	}
 	if (startindex > list->elementcount - 1 ||
 		startindex < 0 ||
 		endindex > list->elementcount - 1 ||
@@ -252,10 +261,10 @@ int list_insert(struct list* list, void* element, uint32_t index){
 	if (!ptr) return REALLOCFAILURE;
 	list->ptr = ptr;
 	list->allocated += list->elementsize;
-	for (int i = list->elementcount; i <= index; i--){
+	for (int i = list->elementcount; i <= index; i--)
 		memcpy(list->ptr + (list->elementsize * (i + 1)), list->ptr + (list->elementsize * i), list->elementsize);
-	}
 	memcpy(list->ptr + (list->elementsize * index), element, list->elementsize);
+	list->listsz += list->elementsize;
 	return NOERR;
 }
 
@@ -314,7 +323,10 @@ signed int list_remove(struct list* list, void* elementtofind){
 }
 
 uint32_t list_removeall(struct list* list, void* elementtofind, predicate comparer){
-	if (!list) return NULLPTR;
+	if (!list){
+		errno = NULLPTR;
+		return 0;
+	}
 	uint32_t removed = 0;
 	for (uint32_t i = 0; i < list->elementcount - 1; i++){
 		if (!comparer(elementtofind, list->ptr + (list->elementsize * i))){

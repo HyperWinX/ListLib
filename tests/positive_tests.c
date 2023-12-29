@@ -11,6 +11,10 @@ int comparer(void* ptr1, void* ptr2){
     else return 0;
 }
 
+void action(void* ptr){
+    int t = *(int*)ptr + 1;
+}
+
 int test_list_init(void){
     struct list listobj = {0};
     int retcode = 0;
@@ -90,6 +94,10 @@ int test_list_addrange1(void){
     if (memcmp(&arr, &restored, sizeof(int32_t)*4)){
         CHECK_ALLOCATED
         return 6;
+    }
+    else if (memcmp(listobj.ptr, &arr, sizeof(int32_t)*4)){
+        CHECK_ALLOCATED
+        return 7;
     }
     CHECK_ALLOCATED
     return retcode;
@@ -201,65 +209,187 @@ int test_list_findindex3(void){
 }
 
 int test_list_findlast(void){
-    
+    struct list listobj = {0};
+    list_init(&listobj, 1, sizeof(int32_t));
+    int32_t arr[10] = {4, 7, 1, 9, 123, 5, 8675, 92478, 8, 5};
+    list_addrange1(&listobj, &arr, 10);
+    int32_t find = 8;
+    int32_t restored = 0;
+    uint32_t retcode = list_findlast(&listobj, &find, &restored, comparer);
+    CHECK_ALLOCATED
+    return retcode;
 }
 
 int test_list_findlastindex1(void){
-
+    struct list listobj = {0};
+    list_init(&listobj, 1, sizeof(int32_t));
+    int32_t arr[8] = {4, 7, 1, 5, 123, 5, 8675, 92478};
+    list_addrange1(&listobj, &arr, 8);
+    int32_t find = 5;
+    uint32_t retcode = list_findlastindex1(&listobj, 2, 6, comparer, &find);
+    CHECK_ALLOCATED
+    if (retcode == 5) return 0;
+    if (retcode == -1) return errno;
 }
 
 int test_list_findlastindex2(void){
-
+    struct list listobj = {0};
+    list_init(&listobj, 1, sizeof(int32_t));
+    int32_t arr[8] = {4, 7, 1, 5, 123, 5, 8675, 92478};
+    list_addrange1(&listobj, &arr, 8);
+    int32_t find = 5;
+    uint32_t retcode = list_findlastindex2(&listobj, 2, comparer, &find);
+    CHECK_ALLOCATED
+    if (retcode == 5) return 0;
+    if (retcode == -1) return errno;
 }
 
 int test_list_findlastindex3(void){
-
+    struct list listobj = {0};
+    list_init(&listobj, 1, sizeof(int32_t));
+    int32_t arr[8] = {4, 7, 1, 5, 123, 5, 8675, 92478};
+    list_addrange1(&listobj, &arr, 8);
+    int32_t find = 5;
+    uint32_t retcode = list_findlastindex3(&listobj, comparer, &find);
+    CHECK_ALLOCATED
+    errno = 0;
+    if (retcode == 5) return 0;
+    if (retcode == -1) return errno;
 }
 
 int test_list_foreach(void){
-
+    struct list listobj = {0};
+    list_init(&listobj, 1, sizeof(int32_t));
+    int32_t arr[8] = {4, 7, 1, 5, 123, 5, 8675, 92478};
+    list_addrange1(&listobj, &arr, 8);
+    list_foreach(&listobj, action);
 }
 
 int test_list_indexof1(void){
-
+    struct list listobj = {0};
+    list_init(&listobj, 1, sizeof(int32_t));
+    int32_t arr[8] = {4, 7, 1, 5, 123, 5, 8675, 92478};
+    list_addrange1(&listobj, &arr, 8);
+    int32_t find = 5;
+    errno = 0;
+    uint32_t retcode = list_indexof1(&listobj, &find);
+    if (retcode != 3 && errno != 0) return 1;
+    else return 0;
 }
 
 int test_list_indexof2(void){
-
+    struct list listobj = {0};
+    list_init(&listobj, 1, sizeof(int32_t));
+    int32_t arr[8] = {4, 7, 1, 5, 123, 5, 8675, 92478};
+    list_addrange1(&listobj, &arr, 8);
+    int32_t find = 5;
+    errno = 0;
+    uint32_t retcode = list_indexof2(&listobj, &find, 2);
+    if (retcode != 3 && errno != 0) return 1;
+    else return 0;
 }
 
 int test_list_indexof3(void){
-
+    struct list listobj = {0};
+    list_init(&listobj, 1, sizeof(int32_t));
+    int32_t arr[8] = {4, 7, 1, 5, 123, 5, 8675, 92478};
+    list_addrange1(&listobj, &arr, 8);
+    int32_t find = 5;
+    errno = 0;
+    uint32_t retcode = list_indexof3(&listobj, &find, 2, 5);
+    if (retcode != 3 && errno != 0) return 1;
+    else return 0;
 }
 
 int test_list_insert(void){
-
+    struct list listobj = {0};
+    list_init(&listobj, 1, sizeof(int32_t));
+    int32_t arr[8] = {4, 7, 1, 5, 123, 5, 8675, 92478};
+    list_addrange1(&listobj, &arr, 8);
 }
 
 int test_list_lastindexof1(void){
-
+    struct list listobj = {0};
+    list_init(&listobj, 1, sizeof(int32_t));
+    int32_t arr[8] = {4, 7, 1, 5, 123, 5, 8675, 92478};
+    list_addrange1(&listobj, &arr, 8);
+    int32_t find = 5;
+    errno = 0;
+    uint32_t retcode = list_lastindexof1(&listobj, &find);
+    if (retcode != 5 && errno != 0) return 1;
+    else return 0;
 }
 
 int test_list_lastindexof2(void){
-
+    struct list listobj = {0};
+    list_init(&listobj, 1, sizeof(int32_t));
+    int32_t arr[8] = {4, 7, 1, 5, 123, 5, 8675, 92478};
+    list_addrange1(&listobj, &arr, 8);
+    int32_t find = 5;
+    errno = 0;
+    uint32_t retcode = list_lastindexof2(&listobj, &find, 4);
+    if (retcode != 5 && errno != 0) return 1;
+    else return 0;
 }
 
 int test_list_lastindexof3(void){
-
+    struct list listobj = {0};
+    list_init(&listobj, 1, sizeof(int32_t));
+    int32_t arr[8] = {4, 7, 1, 5, 123, 5, 8675, 92478};
+    list_addrange1(&listobj, &arr, 8);
+    int32_t find = 5;
+    errno = 0;
+    uint32_t retcode = list_lastindexof3(&listobj, &find, 4, 6);
+    if (retcode != 5 && errno != 0) return 1;
+    else return 0;
 }
 
 int test_list_remove(void){
-
+    struct list listobj = {0};
+    list_init(&listobj, 1, sizeof(int32_t));
+    int32_t arr[8] = {4, 7, 1, 5, 123, 5, 8675, 92478};
+    list_addrange1(&listobj, &arr, 8);
+    int32_t find = 5;
+    signed int retcode = list_remove(&listobj, &find);
+    int check = 0;
+    list_get(&listobj, &check, 3);
+    if (check != find) return 0;
+    else return 1;
 }
 
 int test_list_removeall(void){
-
+    struct list listobj = {0};
+    list_init(&listobj, 1, sizeof(int32_t));
+    int32_t arr[8] = {4, 7, 1, 5, 123, 5, 8675, 92478};
+    list_addrange1(&listobj, &arr, 8);
+    int32_t find = 5;
+    uint32_t retcode = list_removeall(&listobj, &find, comparer);
+    if (retcode != 2) return 1;
+    else return 0;
 }
 
 int test_list_removeat(void){
-
+    struct list listobj = {0};
+    list_init(&listobj, 1, sizeof(int32_t));
+    int32_t arr[8] = {4, 7, 1, 5, 123, 5, 8675, 92478};
+    list_addrange1(&listobj, &arr, 8);
+    signed int retcode = list_removeat(&listobj, 3);
+    int32_t check = 0;
+    list_get(&listobj, &check, 3);
+    if (check != 5) return 0;
+    else return 1;
 }
 
 int test_list_reverse(void){
-    
+    struct list listobj = {0};
+    list_init(&listobj, 1, sizeof(int32_t));
+    int32_t arr[8] = {4, 7, 1, 5, 123, 5, 8675, 92478};
+    list_addrange1(&listobj, &arr, 8);
+    int retcode = list_reverse(&listobj);
+    for (int i = 0; i < 8; i++){
+        int check = 0;
+        list_get(&listobj, &check, 7 - i);
+        if (check != arr[i]) return 1;
+    }
+    return 0;
 }

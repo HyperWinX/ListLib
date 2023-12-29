@@ -32,8 +32,8 @@ uint32_t list_findindex1(struct list* list, uint32_t startindex, uint32_t endind
 uint32_t list_findindex2(struct list* list, uint32_t startindex, predicate comparer, void* elementtofind);
 uint32_t list_findindex3(struct list* list, predicate comparer, void* elementtofind);
 signed int list_findlast(struct list* list, void* elementtofind, void* item, predicate comparer);
-uint32_t list_findlastindex1(struct list* list, uint32_t startindex, uint32_t endindex, predicate comparer, void* elementtofind, void* item);
-uint32_t list_findlastindex2(struct list* list, uint32_t startindex, predicate comparer, void* elementtofind, void* item);
+uint32_t list_findlastindex1(struct list* list, uint32_t startindex, uint32_t endindex, predicate comparer, void* elementtofind);
+uint32_t list_findlastindex2(struct list* list, uint32_t startindex, predicate comparer, void* elementtofind);
 uint32_t list_findlastindex3(struct list* list, predicate comparer, void* elementtofind);
 int list_foreach(struct list* list, void (*action)(void*));
 uint32_t list_indexof1(struct list* list, void* elementtofind);
