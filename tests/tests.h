@@ -1,8 +1,8 @@
 #pragma once
-#include "positive_tests.h"
 #include "negative_tests.h"
 #define POST_DEBUG printf("\tPositive: "); if (retcode){write_failure("[FAIL]", retcode); exit(-1);} else write_success("[ OK ]");
 #define NEGT_DEBUG printf("\tNegative: "); if (retcode){write_failure("[FAIL]", retcode); exit(-1);} else write_success("[ OK ]");
+#define CHECK_ALLOCATED if (listobj.ptr) free(listobj.ptr);
 
 extern jmp_buf sigsegv_restore;
 

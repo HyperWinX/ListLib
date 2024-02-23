@@ -16,7 +16,7 @@ int list_init(struct list* list, size_t initial_count, size_t elementsize){
 	list->elementsize = elementsize;
 	list->listsz = 0;
 	list->elementcount = 0;
-	list->allocated = elementsize;
+	list->allocated = elementsize * initial_count;
 	return NOERR;
 }
 
@@ -66,10 +66,14 @@ int list_addrange1(struct list* list, void* array, int count){
 	if (!array) return NULLPTR;
 	if (!count) return ARGBADRANGE;
 	int retcode = 0;
-	for (uint32_t i = 0; i < count; i++){
-		retcode = list_add(list, array + (list->elementsize * i));
-		if (retcode) return retcode;
+	if (list->allocated < (list->elementcount + count) * list->elementsize){
+		void* newptr = realloc(list->ptr, (list->elementcount + count) * list->elementsize);
+		if (!newptr) return REALLOCFAILURE;
+		list->ptr = newptr;
+		list->allocated = (list->elementcount + count) * list->elementsize;
 	}
+	memcpy(list->ptr + (list->elementsize * list->elementcount), array, list->elementsize * count);
+	list->elementcount += count;
 	return retcode;
 }
 
@@ -77,10 +81,14 @@ int list_addrange2(struct list* list, struct list* src){
 	if (!list) return NULLPTR;
 	if (!src) return NULLPTR;
 	int retcode = 0;
-	for (uint32_t i = 0; i < src->elementcount; i++){
-		retcode = list_add(list, src->ptr + (list->elementsize * i));
-		if (retcode) return retcode;
+	if (list->allocated - list->listsz < src->listsz){
+		void* newptr = realloc(list->ptr, list->listsz + src->listsz);
+		if (!newptr) return REALLOCFAILURE;
+		list->ptr = newptr;
+		list->allocated = list->listsz + src->listsz;
 	}
+	memcpy(list->ptr + (list->elementsize * list->elementcount), src->ptr, src->listsz);
+	list->elementcount += src->elementcount;
 	return retcode;
 }
 
@@ -266,15 +274,18 @@ uint32_t list_indexof3(struct list* list, void* elementtofind, uint32_t startind
 
 int list_insert(struct list* list, void* element, uint32_t index){
 	if (!list) return NULLPTR;
+	if (!element) return NULLPTR;
 	if (index < 0 ||
 		index >= list->elementcount - 1){
 			errno = ARGBADRANGE;
 			return -1;
 	}
-	void* ptr = realloc(list->ptr, list->allocated + list->elementsize);
-	if (!ptr) return REALLOCFAILURE;
-	list->ptr = ptr;
-	list->allocated += list->elementsize;
+	if (list->allocated == list->listsz){
+		void* ptr = realloc(list->ptr, list->allocated + list->elementsize * 4);
+		if (!ptr) return REALLOCFAILURE;
+		list->ptr = ptr;
+		list->allocated += list->elementsize * 4;
+	}
 	for (int i = list->elementcount; i <= index; i--)
 		memcpy(list->ptr + (list->elementsize * (i + 1)), list->ptr + (list->elementsize * i), list->elementsize);
 	memcpy(list->ptr + (list->elementsize * index), element, list->elementsize);
