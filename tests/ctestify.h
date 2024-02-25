@@ -183,11 +183,12 @@ int RETISGOOD(Test test, ComparerResult result){
 		tend = clock(); \
 		long double time = ((long double)(tend - tstart)) / CLOCKS_PER_SEC; \
 		fprintf(ctestify_stdout, "%s%s%s %s.%s (%.3Lf%s)\n", CGREEN, "[      OK ]", CRESET, current_test_suite, testname, time < 1000 ? time * 1000 : time, time < 1000 ? "ms" : "s"); \
-        successed++; } else { \
+        successed++;}else{ \
 		tend = clock(); \
 		long double time = ((double)(tend - tstart)) / CLOCKS_PER_SEC; \
         fprintf(ctestify_stdout, "%s%s%s %s.%s (%.3Lf%s)\n", CRED, "[ FAILURE ]", CRESET, current_test_suite, testname, time < 1000 ? time * 1000 : time, time < 1000 ? "ms" : "s"); \
 		failed++; \
+		if (isassert) assert_failed++; \
         int msg_avail = 0; \
         if (strlen(errmsg) > 1) \
 		    fprintf(ctestify_stdout, "\t%s\n", errmsg); \
@@ -299,11 +300,13 @@ int TestingEnvironmentDestroy(){return 0;}
 //All testing functions
 
 void expect_equals(char* errmsg, int32_t line, ComparerResult comparerresult, Test test, char* firstarg, char* secondarg, char* testname, int index){
+	int isassert = 0;
     DEFAULT_BODY
     RESET_COMPARERRET
 }
 
 void assert_equals(char* errmsg, int32_t line, ComparerResult comparerresult, Test test, char* firstarg, char* secondarg, char* testname, int index){
+	int isassert = 1;
     DEFAULT_BODY
     if (!RETISGOOD(test, comparerresult)) assert_failed++;
     RESET_COMPARERRET

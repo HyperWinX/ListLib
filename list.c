@@ -286,7 +286,7 @@ int list_insert(struct list* list, void* element, uint32_t index){
 		list->ptr = ptr;
 		list->allocated += list->elementsize * 4;
 	}
-	for (int i = list->elementcount; i <= index; i--)
+	for (int i = list->elementcount - 1; i >= index; i--)
 		memcpy(list->ptr + (list->elementsize * (i + 1)), list->ptr + (list->elementsize * i), list->elementsize);
 	memcpy(list->ptr + (list->elementsize * index), element, list->elementsize);
 	list->listsz += list->elementsize;

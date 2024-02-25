@@ -15,7 +15,7 @@ int pcomparer(void* ptr1, void* ptr2){
 }
 
 void paction(void* ptr){
-    int t = *(int*)ptr + 1;
+    *(int*)ptr = *(int*)ptr + 1;
 }
 
 int ptest_list_init(void){
@@ -243,18 +243,25 @@ int ptest_list_findlastindex3(void){
 }
 
 int ptest_list_foreach(void){
+	SET_TEST_SUITE_NAME(LIST_FOREACH);
     struct list listobj = {0};
     list_init(&listobj, 1, sizeof(int32_t));
     int32_t arr[8] = {4, 7, 1, 5, 123, 5, 8675, 92478};
     list_addrange1(&listobj, &arr, 8);
     for (int i = 0; i < 8; i++) arr[i]++;
     list_foreach(&listobj, paction);
+	for (int i = 0; i < 8; i++){
+		int restored = 0;
+		list_get(&listobj, &restored, i);
+		ASSERT_EQ(PLIST_FOREACH_CHECK, restored, arr[i]);
+	}
     ASSERT_FALSE(PLIST_FOREACH_CHECK, memcmp(listobj.ptr, &arr, sizeof(arr)));
     CHECK_ALLOCATED
     return 0;
 }
 
 int ptest_list_indexof1(void){
+	SET_TEST_SUITE_NAME(LIST_INDEXOF1);
     struct list listobj = {0};
     list_init(&listobj, 1, sizeof(int32_t));
     int32_t arr[8] = {4, 7, 1, 5, 123, 5, 8675, 92478};
@@ -266,6 +273,7 @@ int ptest_list_indexof1(void){
 }
 
 int ptest_list_indexof2(void){
+	SET_TEST_SUITE_NAME(LIST_INDEXOF2);
     struct list listobj = {0};
     list_init(&listobj, 1, sizeof(int32_t));
     int32_t arr[8] = {4, 7, 1, 5, 123, 5, 8675, 92478};
@@ -277,6 +285,7 @@ int ptest_list_indexof2(void){
 }
 
 int ptest_list_indexof3(void){
+	SET_TEST_SUITE_NAME(LIST_INDEXOF3);
     struct list listobj = {0};
     list_init(&listobj, 1, sizeof(int32_t));
     int32_t arr[8] = {4, 7, 1, 5, 123, 5, 8675, 92478};
@@ -288,6 +297,7 @@ int ptest_list_indexof3(void){
 }
 
 int ptest_list_insert(void){
+	SET_TEST_SUITE_NAME(LIST_INSERT);
     struct list listobj = {0};
     list_init(&listobj, 1, sizeof(int32_t));
     int32_t arr[8] = {4, 7, 1, 5, 123, 5, 8675, 92478};
@@ -300,6 +310,7 @@ int ptest_list_insert(void){
 }
 
 int ptest_list_lastindexof1(void){
+	SET_TEST_SUITE_NAME(LIST_LASTINDEXOF1);
     struct list listobj = {0};
     list_init(&listobj, 1, sizeof(int32_t));
     int32_t arr[8] = {4, 7, 1, 5, 123, 5, 8675, 92478};
@@ -310,6 +321,7 @@ int ptest_list_lastindexof1(void){
 }
 
 int ptest_list_lastindexof2(void){
+	SET_TEST_SUITE_NAME(LIST_LASTINDEXOF2);
     struct list listobj = {0};
     list_init(&listobj, 1, sizeof(int32_t));
     int32_t arr[8] = {4, 7, 1, 5, 123, 5, 8675, 92478};
@@ -320,6 +332,7 @@ int ptest_list_lastindexof2(void){
 }
 
 int ptest_list_lastindexof3(void){
+	SET_TEST_SUITE_NAME(LIST_LASTINDEXOF3);
     struct list listobj = {0};
     list_init(&listobj, 1, sizeof(int32_t));
     int32_t arr[8] = {4, 7, 1, 5, 123, 5, 8675, 92478};
