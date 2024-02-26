@@ -322,6 +322,7 @@ int ptest_list_lastindexof1(void){
     list_addrange1(&listobj, &arr, 8);
     int32_t find = 5;
     ASSERT_EQ(PLIST_LASTINDEXOF1, list_lastindexof1(&listobj, &find), 5);
+	CHECK_ALLOCATED
     return 0;
 }
 
@@ -333,6 +334,7 @@ int ptest_list_lastindexof2(void){
     list_addrange1(&listobj, &arr, 8);
     int32_t find = 5;
     ASSERT_EQ(PLIST_LASTINDEXOF2, list_lastindexof2(&listobj, &find, 4), 5);
+	CHECK_ALLOCATED
     return 0;
 }
 
@@ -344,6 +346,7 @@ int ptest_list_lastindexof3(void){
     list_addrange1(&listobj, &arr, 8);
     int32_t find = 5;
     ASSERT_EQ(PLIST_LASTINDEXOF3, list_lastindexof3(&listobj, &find, 4, 6), 5);
+	CHECK_ALLOCATED
     return 0;
 }
 
@@ -358,6 +361,7 @@ int ptest_list_remove(void){
     int check = 0;
     list_get(&listobj, &check, 3);
 	ASSERT_NEQ(PLIST_REMOVE_CHECK, check, find);
+	CHECK_ALLOCATED
     return 0;
 }
 
@@ -368,7 +372,8 @@ int ptest_list_removeall(void){
     int32_t arr[8] = {4, 7, 1, 5, 123, 5, 8675, 92478};
     list_addrange1(&listobj, &arr, 8);
     int32_t find = 5;
-    ASSERT_EQ(PLIST_REMOVEALL, list_removeall(&listobj, &find, pcomparer), 2)
+    ASSERT_EQ(PLIST_REMOVEALL, list_removeall(&listobj, &find, pcomparer), 2);
+	CHECK_ALLOCATED
 	return 0;
 }
 
@@ -382,6 +387,7 @@ int ptest_list_removeat(void){
     int32_t check = 0;
     list_get(&listobj, &check, 3);
     ASSERT_EQ(PLIST_REMOVEAT_CHECK, check, 123);
+	CHECK_ALLOCATED
 	return 0;
 }
 
@@ -397,43 +403,87 @@ int ptest_list_reverse(void){
         list_get(&listobj, &check, 7 - i);
         ASSERT_EQ(PLIST_REVERSE_CHECK, check, arr[i]);
     }
+	CHECK_ALLOCATED
     return 0;
 }
 
-char* test_strings[] = {
-    "List initialization...              ",
-    "List destroy...                     ",
-    "List value set...                   ",
-    "List value get...                   ",
-    "List add value...                   ",
-    "List addrange1...                   ",
-    "List addrange2...                   ",
-    "List clear...                       ",
-    "List contains element...            ",
-    "List element exists...              ",
-    "List find element using predicate...",
-    "List find index 1 using predicate...",
-    "List find index 2 using predicate...",
-    "List find index 3 using predicate...",
-    "List find last element using pred...",
-    "List find last index 1 using pred...",
-    "List find last index 2 using pred...",
-    "List find last index 3 using pred...",
-    "List execute action for each element",
-    "List index of element 1...          ",
-    "List index of element 2...          ",
-    "List index of element 3...          ",
-    "List insert element...              ",
-    "List last index of element 1...     ",
-    "List last index of element 2...     ",
-    "List last index of element 3...     ",
-    "List remove element...              ",
-    "List remove all using predicate...  ",
-    "List remove element at index...     ",
-    "List reverse..."
-};
+int ntest_list_init(void){
+	SET_TEST_SUITE_NAME(LIST_INIT);
+	struct list listobj = {0};
+	ASSERT_TRUE(NTEST_LIST_INIT1, list_init((void*)0, 1, 1));
+	ASSERT_TRUE(NTEST_LIST_INIT2, list_init(&listobj, 0, 1));
+	ASSERT_TRUE(NTEST_LIST_INIT3, list_init(&listobj, 1, 0));
+	return 0;
+}
 
-test positive_tests[] = {
+int ntest_list_destroy(void){
+	SET_TEST_SUITE_NAME(LIST_DESTROY);
+	ASSERT_TRUE(NTEST_LIST_DESTROY, list_destroy((void*)0));
+	return 0;
+}
+
+int ntest_list_set(void){
+	SET_TEST_SUITE_NAME(LIST_SET);
+	struct list listobj;
+	int t = 5;
+	list_init(&listobj, 1, sizeof(int));
+	ASSERT_TRUE(NTEST_LIST_SET1, list_set((void*)0, &t, 0));
+	ASSERT_TRUE(NTEST_LIST_SET2, list_set(&listobj, (void*)0, 0));
+	ASSERT_TRUE(NTEST_LIST_SET3, list_set(&listobj, &t, 10));
+	CHECK_ALLOCATED
+	return 0;
+}
+
+int ntest_list_get(void){
+	struct list listobj;
+	list_init(&listobj, 1, sizeof(int));
+	int restore;
+	ASSERT_TRUE(NTEST_LIST_GET1, list_get((void*)0, &restore, 0));
+	ASSERT_TRUE(NTEST_LIST_GET2, list_get(&listobj, (void*)0, 0));
+	ASSERT_TRUE(NTEST_LIST_GET3, list_get(&listobj, &restore, 5));
+	CHECK_ALLOCATED
+	return 0;
+}
+
+int ntest_list_add(void){
+	SET_TEST_SUITE_NAME(LIST_ADD);
+	struct list listobj;
+	list_init(&listobj, 1, sizeof(int));
+	int t = 5;
+	ASSERT_TRUE(NTEST_LIST_ADD1, list_add((void*)0, &t));
+	ASSERT_TRUE(NTEST_LIST_ADD2, list_add(&listobj, (void*)0));
+	CHECK_ALLOCATED
+	return 0;
+}
+
+int ntest_list_addrange1(void){
+	SET_TEST_SUITE_NAME(LIST_ADDRANGE1);
+	struct list listobj;
+	list_init(&listobj, 1, sizeof(int));
+	int arr[3] = {0};
+	ASSERT_TRUE(NTEST_LIST_ADDRANGE1_1, list_addrange1((void*)0, &arr, 3));
+	ASSERT_TRUE(NTEST_LIST_ADDRANGE1_2, list_addrange1(&listobj, (void*)0, 3));
+	ASSERT_TRUE(NTEST_LIST_ADDRANGE1_3, list_addrange1(&listobj, &arr, 0));
+	CHECK_ALLOCATED
+	return 0;
+}
+
+int ntest_list_addrange2(void){
+    SET_TEST_SUITE_NAME(LIST_ADDRANGE2);              struct list listobj, arr;
+    list_init(&listobj, 1, sizeof(int));
+    ASSERT_TRUE(NTEST_LIST_ADDRANGE2_1, list_addrange2((void*)0, &arr));
+    ASSERT_TRUE(NTEST_LIST_ADDRANGE2_2, list_addrange2(&listobj, (void*)0));
+	CHECK_ALLOCATED
+	return 0;
+}
+
+int ntest_list_clear(void){
+	SET_TEST_SUITE_NAME(LIST_CLEAR);
+	ASSERT_TRUE(NTEST_LIST_CLEAR, list_clear((void*)0));
+	return 0;
+}
+
+test tests[] = {
     ptest_list_init,
     ptest_list_destroy,
     ptest_list_set,
@@ -463,13 +513,21 @@ test positive_tests[] = {
     ptest_list_remove,
 	ptest_list_removeall,
     ptest_list_removeat,
-    ptest_list_reverse
+    ptest_list_reverse,
+	ntest_list_init,
+	ntest_list_destroy,
+	ntest_list_set,
+	ntest_list_get,
+	ntest_list_add,
+	ntest_list_addrange1,
+	ntest_list_addrange2,
+	ntest_list_clear
 };
 
-int positive_test_count = 30;
+int test_count = 38;
 
 void test_main(void){
-    for (int i = 0; i < positive_test_count; i++){
-        positive_tests[i]();
+    for (int i = 0; i < test_count; i++){
+        tests[i]();
     }
 }

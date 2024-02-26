@@ -371,6 +371,7 @@ signed int list_removeat(struct list* list, uint32_t index){
 		index < 0) return INDEXOUTOFRANGE;
 	for (uint32_t i = index + 1; i < list->elementcount; i++)
 		memcpy(list->ptr + (list->elementsize * (i - 1)), list->ptr + (list->elementsize * i), list->elementsize);
+	return NOERR;
 }
 
 int list_reverse(struct list* list){
