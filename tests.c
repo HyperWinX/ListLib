@@ -18,6 +18,10 @@ void paction(void* ptr){
     *(int*)ptr = *(int*)ptr + 1;
 }
 
+void pprint(void* ptr){
+	printf("%d\n", *(int*)ptr);
+}
+
 int ptest_list_init(void){
     SET_TEST_SUITE_NAME(LIST_INIT);
     struct list listobj = {0};
@@ -301,6 +305,7 @@ int ptest_list_insert(void){
     struct list listobj = {0};
     list_init(&listobj, 1, sizeof(int32_t));
     int32_t arr[8] = {4, 7, 1, 5, 123, 5, 8675, 92478};
+	list_addrange1(&listobj, &arr, 8);
     int32_t test_val = 420, restored = 0;
     ASSERT_FALSE(PLIST_INSERT, list_insert(&listobj, &test_val, 2));
     list_get(&listobj, &restored, 2);
@@ -327,7 +332,7 @@ int ptest_list_lastindexof2(void){
     int32_t arr[8] = {4, 7, 1, 5, 123, 5, 8675, 92478};
     list_addrange1(&listobj, &arr, 8);
     int32_t find = 5;
-    ASSERT_EQ(PLIST_LASTINDEXOF1, list_lastindexof2(&listobj, &find, 4), 5);
+    ASSERT_EQ(PLIST_LASTINDEXOF2, list_lastindexof2(&listobj, &find, 4), 5);
     return 0;
 }
 
@@ -338,56 +343,59 @@ int ptest_list_lastindexof3(void){
     int32_t arr[8] = {4, 7, 1, 5, 123, 5, 8675, 92478};
     list_addrange1(&listobj, &arr, 8);
     int32_t find = 5;
-    ASSERT_EQ(PLIST_LASTINDEXOF1, list_lastindexof3(&listobj, &find, 4, 6), 5);
+    ASSERT_EQ(PLIST_LASTINDEXOF3, list_lastindexof3(&listobj, &find, 4, 6), 5);
     return 0;
 }
 
 int ptest_list_remove(void){
+	SET_TEST_SUITE_NAME(LIST_REMOVE);
     struct list listobj = {0};
     list_init(&listobj, 1, sizeof(int32_t));
     int32_t arr[8] = {4, 7, 1, 5, 123, 5, 8675, 92478};
     list_addrange1(&listobj, &arr, 8);
     int32_t find = 5;
-    signed int retcode = list_remove(&listobj, &find);
+    ASSERT_FALSE(PLIST_REMOVE, list_remove(&listobj, &find));
     int check = 0;
     list_get(&listobj, &check, 3);
-    if (check != find) return 0;
-    else return 1;
+	ASSERT_NEQ(PLIST_REMOVE_CHECK, check, find);
+    return 0;
 }
 
 int ptest_list_removeall(void){
+	SET_TEST_SUITE_NAME(LIST_REMOVEALL);
     struct list listobj = {0};
     list_init(&listobj, 1, sizeof(int32_t));
     int32_t arr[8] = {4, 7, 1, 5, 123, 5, 8675, 92478};
     list_addrange1(&listobj, &arr, 8);
     int32_t find = 5;
-    uint32_t retcode = list_removeall(&listobj, &find, pcomparer);
-    if (retcode != 2) return 1;
-    else return 0;
+    ASSERT_EQ(PLIST_REMOVEALL, list_removeall(&listobj, &find, pcomparer), 2)
+	return 0;
 }
 
 int ptest_list_removeat(void){
+	SET_TEST_SUITE_NAME(LIST_REMOVEAT);
     struct list listobj = {0};
     list_init(&listobj, 1, sizeof(int32_t));
     int32_t arr[8] = {4, 7, 1, 5, 123, 5, 8675, 92478};
     list_addrange1(&listobj, &arr, 8);
-    signed int retcode = list_removeat(&listobj, 3);
+    ASSERT_FALSE(PLIST_REMOVEAT, list_removeat(&listobj, 3));
     int32_t check = 0;
     list_get(&listobj, &check, 3);
-    if (check != 5) return 0;
-    else return 1;
+    ASSERT_EQ(PLIST_REMOVEAT_CHECK, check, 123);
+	return 0;
 }
 
 int ptest_list_reverse(void){
+	SET_TEST_SUITE_NAME(LIST_REVERSE);
     struct list listobj = {0};
     list_init(&listobj, 1, sizeof(int32_t));
     int32_t arr[8] = {4, 7, 1, 5, 123, 5, 8675, 92478};
     list_addrange1(&listobj, &arr, 8);
-    int retcode = list_reverse(&listobj);
+    ASSERT_FALSE(PLIST_REVERSE, list_reverse(&listobj));
     for (int i = 0; i < 8; i++){
         int check = 0;
         list_get(&listobj, &check, 7 - i);
-        if (check != arr[i]) return 1;
+        ASSERT_EQ(PLIST_REVERSE_CHECK, check, arr[i]);
     }
     return 0;
 }
@@ -452,13 +460,13 @@ test positive_tests[] = {
     ptest_list_lastindexof1,
     ptest_list_lastindexof2,
     ptest_list_lastindexof3,
-    // ptest_list_remove,
-    // ptest_list_removeall,
-    // ptest_list_removeat,
-    // ptest_list_reverse
+    ptest_list_remove,
+	ptest_list_removeall,
+    ptest_list_removeat,
+    ptest_list_reverse
 };
 
-int positive_test_count = 25;
+int positive_test_count = 30;
 
 void test_main(void){
     for (int i = 0; i < positive_test_count; i++){

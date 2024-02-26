@@ -171,7 +171,7 @@ uint32_t list_findindex3(struct list* list, predicate comparer, void* elementtof
 
 signed int list_findlast(struct list* list, void* elementtofind, void* item, predicate comparer){
 	if (!list) return NULLPTR;
-	for (int i = list->elementcount; i >= 0; i--)
+	for (int i = list->elementcount - 1; i >= 0; i--)
 		if (!comparer(list->ptr + (list->elementsize * i), elementtofind)){
 			memcpy(item, list->ptr + (list->elementsize * i), list->elementsize);
 			return NOERR;
@@ -286,7 +286,7 @@ int list_insert(struct list* list, void* element, uint32_t index){
 		list->ptr = ptr;
 		list->allocated += list->elementsize * 4;
 	}
-	for (int i = list->elementcount - 1; i >= index; i--)
+	for (uint32_t i = list->elementcount - 1; i >= index; i--)
 		memcpy(list->ptr + (list->elementsize * (i + 1)), list->ptr + (list->elementsize * i), list->elementsize);
 	memcpy(list->ptr + (list->elementsize * index), element, list->elementsize);
 	list->listsz += list->elementsize;
@@ -339,8 +339,11 @@ signed int list_remove(struct list* list, void* elementtofind){
 	for (uint32_t i = 0; i < list->elementcount; i++){
 		if (!memcmp(elementtofind, list->ptr + (list->elementsize * i), list->elementsize)){
 			memset(list->ptr + (list->elementsize * i), 0x00, list->elementsize);
-			for (uint32_t j = i + 1; j < list->elementsize - 1; j++)
-				memcpy(list->ptr + (list->elementsize * j - 1), list->ptr + (list->elementsize * j), list->elementsize);
+			
+			for (uint32_t j = i + 1; j < list->elementsize - 1; j++){
+				memcpy(list->ptr + (list->elementsize * (j - 1)), list->ptr + (list->elementsize * j), list->elementsize);
+				puts("Copied");
+			}
 			return NOERR;
 		}
 	}
@@ -366,15 +369,15 @@ signed int list_removeat(struct list* list, uint32_t index){
 	if (!list) return NULLPTR;
 	if (index > list->elementcount - 1 ||
 		index < 0) return INDEXOUTOFRANGE;
-	return list_remove(list, list->ptr + (list->elementsize * index));
+	for (uint32_t i = index + 1; i < list->elementcount; i++)
+		memcpy(list->ptr + (list->elementsize * (i - 1)), list->ptr + (list->elementsize * i), list->elementsize);
 }
 
 int list_reverse(struct list* list){
 	if (!list) return NULLPTR;
 	uint32_t left = 0, right = 0;
 	uint32_t length = list->elementcount;
-	void* tmpbuf = calloc(list->elementsize, 1);
-	if (!tmpbuf) return ALLOCFAILURE;
+	char tmpbuf[list->elementsize];
 	for (left = 0, right = length - 1; left < right; left++, right--){
 		memcpy(tmpbuf, list->ptr + (list->elementsize * left), list->elementsize);
 		memcpy(list->ptr + (list->elementsize * left), list->ptr + (list->elementsize * right), list->elementsize);
