@@ -483,6 +483,21 @@ int ntest_list_clear(void){
 	return 0;
 }
 
+int ntest_list_contains(void){
+	SET_TEST_SUITE_NAME(LIST_CONTAINS);
+	ASSERT_TRUE(NTEST_LIST_CONTAINS1, list_contains(0, (void*)1));
+	ASSERT_TRUE(NTEST_LIST_CONTAINS2, list_contains((void*)1, 0));
+	return 0;
+}
+
+int ntest_list_exists(void){
+	SET_TEST_SUITE_NAME(LIST_EXISTS);
+	ASSERT_TRUE(NTEST_LIST_EXISTS1, list_exists(0, (void*)1, (void*)1));
+	ASSERT_TRUE(NTEST_LIST_EXISTS1, list_exists((void*)1, 0, (void*)1));
+	ASSERT_TRUE(NTEST_LIST_EXISTS1, list_exists((void*)1, (void*)1, 0));
+	return 0;
+}
+
 test tests[] = {
     ptest_list_init,
     ptest_list_destroy,
@@ -521,10 +536,12 @@ test tests[] = {
 	ntest_list_add,
 	ntest_list_addrange1,
 	ntest_list_addrange2,
-	ntest_list_clear
+	ntest_list_clear,
+	ntest_list_contains,
+	ntest_list_exists
 };
 
-int test_count = 38;
+int test_count = 40;
 
 void test_main(void){
     for (int i = 0; i < test_count; i++){
