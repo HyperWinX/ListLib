@@ -1,0 +1,3 @@
+[submodule "CTestify"]
+	path = CTestify
+	url = https://github.com/HyperWinX/CTestify

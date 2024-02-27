@@ -5,7 +5,7 @@
 #include <signal.h>
 #include "list.h"
 #include "tests/tests.h"
-#include "tests/ctestify.h"
+#include "CTestify/ctestify.h"
 
 jmp_buf sigsegv_restore = {0};
 
