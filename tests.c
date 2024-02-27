@@ -493,8 +493,25 @@ int ntest_list_contains(void){
 int ntest_list_exists(void){
 	SET_TEST_SUITE_NAME(LIST_EXISTS);
 	ASSERT_TRUE(NTEST_LIST_EXISTS1, list_exists(0, (void*)1, (void*)1));
-	ASSERT_TRUE(NTEST_LIST_EXISTS1, list_exists((void*)1, 0, (void*)1));
-	ASSERT_TRUE(NTEST_LIST_EXISTS1, list_exists((void*)1, (void*)1, 0));
+	ASSERT_TRUE(NTEST_LIST_EXISTS2, list_exists((void*)1, 0, (void*)1));
+	ASSERT_TRUE(NTEST_LIST_EXISTS3, list_exists((void*)1, (void*)1, 0));
+	return 0;
+}
+
+int ntest_list_find(void){
+	SET_TEST_SUITE_NAME(LIST_FIND);
+	struct list listobj;
+	list_init(&listobj, 1, sizeof(int));
+	int find = 5, restore = 0;
+	ASSERT_TRUE(NTEST_LIST_FIND1, list_find(0, &find, pcomparer, &restore));
+	ASSERT_TRUE(NTEST_LIST_FIND2, list_find(&listobj, 0, pcomparer, &restore));
+	ASSERT_TRUE(NTEST_LIST_FIND3, list_find(&listobj, &find, 0, &restore));
+	ASSERT_TRUE(NTEST_LIST_FIND4, list_find(&listobj, &find, pcomparer, 0));
+	return 0;
+}
+
+int ntest_list_findindex1(void){
+	SET_TEST_SUITE_NAME(LIST_FINDINDEX1);
 	return 0;
 }
 
@@ -538,10 +555,11 @@ test tests[] = {
 	ntest_list_addrange2,
 	ntest_list_clear,
 	ntest_list_contains,
-	ntest_list_exists
+	ntest_list_exists,
+	ntest_list_find
 };
 
-int test_count = 40;
+int test_count = 41;
 
 void test_main(void){
     for (int i = 0; i < test_count; i++){

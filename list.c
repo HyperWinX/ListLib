@@ -140,7 +140,7 @@ uint32_t list_findindex1(struct list* list, uint32_t startindex, uint32_t endind
 	    startindex < 0 ||
 	    startindex > endindex){
 			errno = ARGBADRANGE;
-			return -1;
+			return 0;
 		}
 	for(uint32_t i = startindex; i < end; i++)
 		if (!comparer(list->ptr + (list->elementsize * i), elementtofind)) return i;
