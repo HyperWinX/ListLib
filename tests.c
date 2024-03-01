@@ -204,7 +204,7 @@ int ptest_list_findlast(void){
     list_addrange1(&listobj, &arr, 10);
     int32_t find = 8;
     int32_t restored = 0;
-    ASSERT_FALSE(PLIST_FINDLAST, list_findlast(&listobj, &find, &restored, pcomparer));
+    ASSERT_FALSE(PLIST_FINDLAST, list_findlast(&listobj, &find, pcomparer, &restored));
     ASSERT_EQ(PLIST_FINDLAST_CHECK, restored, find);
     CHECK_ALLOCATED
     return 0;
@@ -543,6 +543,8 @@ int ntest_list_findindex2(void){
 	ASSERT_EQ(NTEST_LIST_FINDINDEX2_3, errno, NULLPTR);
 	ASSERT_FALSE(NTEST_LIST_FINDINDEX2_4, list_findindex2(&listobj, 5, pcomparer, &find));
 	ASSERT_EQ(NTEST_LIST_FINDINDEX2_4, errno, ARGBADRANGE);
+	ASSERT_FALSE(NTEST_LIST_FINDINDEX2_5, list_findindex2(&listobj, 0, pcomparer, &find));
+	ASSERT_EQ(NTEST_LIST_FINDINDEX2_5, errno, ITEMNOTFOUND);
 	return 0;
 }
 
@@ -557,6 +559,70 @@ int ntest_list_findindex3(void){
 	ASSERT_EQ(NTEST_LIST_FINDINDEX3_2, errno, NULLPTR);
 	ASSERT_FALSE(NTEST_LIST_FINDINDEX3_3, list_findindex3(&listobj, pcomparer, 0));
 	ASSERT_EQ(NTEST_LIST_FINDINDEX3_3, errno, NULLPTR);
+	return 0;
+}
+
+int ntest_list_findlast(void){
+	SET_TEST_SUITE_NAME(LIST_FINDLAST);
+	struct list listobj;
+	list_init(&listobj, 1, sizeof(int));
+	int find = 5, restore = 6;
+	ASSERT_TRUE(NTEST_LIST_FIND1, list_findlast(0, &find, pcomparer, &restore));
+	ASSERT_TRUE(NTEST_LIST_FIND2, list_findlast(&listobj, 0, pcomparer, &restore));
+	ASSERT_TRUE(NTEST_LIST_FIND3, list_findlast(&listobj, &find, 0, &restore));
+	ASSERT_TRUE(NTEST_LIST_FIND4, list_findlast(&listobj, &find, pcomparer, 0));
+	ASSERT_TRUE(NTEST_LIST_FIND5, list_findlast(&listobj, &find, pcomparer, &restore));
+	restore = 10;
+	return 0;
+}
+
+int ntest_list_findlastindex1(void){
+	SET_TEST_SUITE_NAME(LIST_FINDLASTINDEX1);
+    struct list listobj;
+    list_init(&listobj, 1, sizeof(int));
+    int find = 5;
+	ASSERT_FALSE(NTEST_LIST_FINDLASTINDEX1_1, list_findlastindex1(0, 0, 0, pcomparer, &find));
+	ASSERT_EQ(NTEST_LIST_FINDLASTINDEX1_1, errno, NULLPTR);
+	ASSERT_FALSE(NTEST_LIST_FINDLASTINDEX1_2, list_findlastindex1(&listobj, 0, 0, 0, &find));
+	ASSERT_EQ(NTEST_LIST_FINDLASTINDEX1_2, errno, NULLPTR);
+	ASSERT_FALSE(NTEST_LIST_FINDLASTINDEX1_3, list_findlastindex1(&listobj, 0, 0, pcomparer, 0));
+	ASSERT_EQ(NTEST_LIST_FINDLASTINDEX1_3, errno, NULLPTR);
+	ASSERT_FALSE(NTEST_LIST_FINDLASTINDEX1_4, list_findlastindex1(&listobj, 5, 0, pcomparer, &find));
+	ASSERT_EQ(NTEST_LIST_FINDLASTINDEX1_4, errno, ARGBADRANGE);
+	ASSERT_FALSE(NTEST_LIST_FINDLASTINDEX1_5, list_findlastindex1(&listobj, 5, 8, pcomparer, &find));
+	ASSERT_EQ(NTEST_LIST_FINDLASTINDEX1_5, errno, ARGBADRANGE);
+	return 0;
+}
+
+int ntest_list_findlastindex2(void){
+	SET_TEST_SUITE_NAME(LIST_FINDLASTINDEX2);
+    struct list listobj;
+    list_init(&listobj, 1, sizeof(int));
+    int find = 5;
+	ASSERT_FALSE(NTEST_LIST_FINDLASTINDEX2_1, list_findlastindex2(0, 0, pcomparer, &find));
+	ASSERT_EQ(NTEST_LIST_FINDLASTINDEX2_1, errno, NULLPTR);
+	ASSERT_FALSE(NTEST_LIST_FINDLASTINDEX2_2, list_findlastindex2(&listobj, 0, 0, &find));
+	ASSERT_EQ(NTEST_LIST_FINDLASTINDEX2_2, errno, NULLPTR);
+	ASSERT_FALSE(NTEST_LIST_FINDLASTINDEX2_3, list_findlastindex2(&listobj, 0, pcomparer, 0));
+	ASSERT_EQ(NTEST_LIST_FINDLASTINDEX2_3, errno, NULLPTR);
+	ASSERT_FALSE(NTEST_LIST_FINDLASTINDEX2_4, list_findlastindex2(&listobj, 5, pcomparer, &find));
+	ASSERT_EQ(NTEST_LIST_FINDLASTINDEX2_4, errno, ARGBADRANGE);
+	ASSERT_FALSE(NTEST_LIST_FINDLASTINDEX2_5, list_findlastindex2(&listobj, 0, pcomparer, &find));
+	ASSERT_EQ(NTEST_LIST_FINDLASTINDEX2_5, errno, ITEMNOTFOUND);
+	return 0;
+}
+
+int ntest_list_findlastindex3(void){
+	SET_TEST_SUITE_NAME(LIST_FINDLASTINDEX3);
+    struct list listobj;
+    list_init(&listobj, 1, sizeof(int));
+    int find = 5;
+	ASSERT_FALSE(NTEST_LIST_FINDLASTINDEX3_1, list_findlastindex3(0, pcomparer, &find));
+	ASSERT_EQ(NTEST_LIST_FINDLASTINDEX3_1, errno, NULLPTR);
+	ASSERT_FALSE(NTEST_LIST_FINDLASTINDEX3_2, list_findlastindex3(&listobj, 0, &find));
+	ASSERT_EQ(NTEST_LIST_FINDLASTINDEX3_2, errno, NULLPTR);
+	ASSERT_FALSE(NTEST_LIST_FINDLASTINDEX3_3, list_findlastindex3(&listobj, pcomparer, 0));
+	ASSERT_EQ(NTEST_LIST_FINDLASTINDEX3_3, errno, NULLPTR);
 	return 0;
 }
 
@@ -602,10 +668,16 @@ test tests[] = {
 	ntest_list_contains,
 	ntest_list_exists,
 	ntest_list_find,
-	ntest_list_findindex1
+	ntest_list_findindex1,
+	ntest_list_findindex2,
+	ntest_list_findindex3,
+	ntest_list_findlast,
+	ntest_list_findlastindex1,
+	ntest_list_findlastindex2,
+	ntest_list_findlastindex3
 };
 
-int test_count = 42;
+int test_count = 48;
 
 void test_main(void){
     for (int i = 0; i < test_count; i++){

@@ -4,6 +4,8 @@
 #include <string.h>
 #include "list.h"
 
+#define ELEMENTCNTINDEX() (list->elementcount == 0 ? 0 : list->elementcount - 1)
+
 //Basic actions
 
 int list_init(struct list* list, size_t initial_count, size_t elementsize){
@@ -135,7 +137,7 @@ uint32_t list_findindex1(struct list* list, uint32_t startindex, uint32_t endind
 	if (!list) goto nullptr;
 	if (!comparer) goto nullptr;
 	if (!elementtofind) goto nullptr;
-	if (startindex > list->elementcount - 1 ||
+	if (startindex > ELEMENTCNTINDEX() ||
 	    startindex < 0 ||
 	    startindex > endindex){
 			errno = ARGBADRANGE;
@@ -151,27 +153,37 @@ nullptr:
 }
 
 uint32_t list_findindex2(struct list* list, uint32_t startindex, predicate comparer, void* elementtofind){
-	if (!list) return NULLPTR;
-	if (startindex > list->elementcount - 1 ||
+	if (!list) goto nullptr;
+	if (!comparer) goto nullptr;
+	if (!elementtofind) goto nullptr;
+	if (startindex > ELEMENTCNTINDEX() ||
 	    startindex < 0){
 			errno = ARGBADRANGE;
-			return -1;
+			return 0;
 		}
 	for (uint32_t i = startindex; i < list->elementcount; i++)
 		if(!comparer(list->ptr + (list->elementsize * i), elementtofind)) return i;
 	errno = ITEMNOTFOUND;
 	return 0;
+nullptr:
+	errno = NULLPTR;
+	return 0;
 }
 
 uint32_t list_findindex3(struct list* list, predicate comparer, void* elementtofind){
-	if (!list) return NULLPTR;
+	if (!list) goto nullptr;
+	if (!comparer) goto nullptr;
+	if (!elementtofind) goto nullptr;
 	for (uint32_t i = 0; i < list->elementcount; i++)
 		if (!comparer(list->ptr + (list->elementsize * i), elementtofind)) return i;
 	errno = ITEMNOTFOUND;
 	return 0;
+nullptr:
+	errno = NULLPTR;
+	return 0;
 }
 
-signed int list_findlast(struct list* list, void* elementtofind, void* item, predicate comparer){
+signed int list_findlast(struct list* list, void* elementtofind, predicate comparer, void* item){
 	if (!list) return NULLPTR;
 	for (int i = list->elementcount - 1; i >= 0; i--)
 		if (!comparer(list->ptr + (list->elementsize * i), elementtofind)){
