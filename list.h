@@ -1,3 +1,5 @@
+#pragma once
+
 #define ARGBADRANGE -2
 #define ITEMNOTFOUND -1
 #define NOERR 0
@@ -7,22 +9,27 @@
 #define INDEXOUTOFRANGE 4
 #define NULLPTR 5
 
-struct list{
+typedef struct list{
 	void* ptr;
 	size_t elementsize;
 	size_t listsz;
 	uint32_t elementcount;
 	size_t allocated;
-};
+} list;
+
+typedef struct indexpair{
+	int32_t code;
+	uint32_t index;
+} indexpair;
 
 typedef int (*predicate)(void*,void*);
 
-int list_init(struct list* list, size_t initial_count, size_t elementsize);
-int list_get(struct list* list, void* element, int index);
-int list_set(struct list* list, void* element, int index);
-int list_destroy(struct list* list);
-int list_add(struct list* list, void* element);
-int list_addrange1(struct list* list, void* array, int count);
+list list_init(size_t initial_count, size_t elementsize);
+indexpair list_get(struct list* list, void* element, uint32_t index);
+indexpair list_set(struct list* list, void* element, uint32_t index);
+indexpair list_destroy(struct list* list);
+indexpair list_add(struct list* list, void* element);
+indexpair list_addrange1(struct list* list, void* array, int count);
 int list_addrange2(struct list* list, struct list* src);
 int list_clear(struct list* list);
 signed int list_contains(struct list* list, void* element);
