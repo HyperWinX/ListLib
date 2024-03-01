@@ -132,19 +132,21 @@ signed int list_find(struct list* list, void* elementtofind, predicate comparer,
 }
 
 uint32_t list_findindex1(struct list* list, uint32_t startindex, uint32_t endindex, predicate comparer, void* elementtofind){
-	if (!list) return NULLPTR;
-	if (!comparer) return NULLPTR;
-	if (!elementtofind) return NULLPTR;
-	uint32_t end = (endindex > list->elementcount - 1 ? list->elementcount : endindex);
+	if (!list) goto nullptr;
+	if (!comparer) goto nullptr;
+	if (!elementtofind) goto nullptr;
 	if (startindex > list->elementcount - 1 ||
 	    startindex < 0 ||
 	    startindex > endindex){
 			errno = ARGBADRANGE;
 			return 0;
-		}
-	for(uint32_t i = startindex; i < end; i++)
+	}
+	for(uint32_t i = startindex; i < endindex; i++)
 		if (!comparer(list->ptr + (list->elementsize * i), elementtofind)) return i;
 	errno = ITEMNOTFOUND;
+	return 0;
+nullptr:
+	errno = NULLPTR;
 	return 0;
 }
 
