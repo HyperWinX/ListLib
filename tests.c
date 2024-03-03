@@ -73,13 +73,11 @@ int ptest_list_add(void){
 int ptest_list_addrange1(void){
     SET_TEST_SUITE_NAME(LIST_ADDRANGE1);
     struct list listobj = list_init(1, sizeof(int32_t));
-    
     int32_t arr[4] = {4, 7, 1, 9};
-    ASSERT_FALSE(PLIST_ADDRANGE, list_addrange1(&listobj, &arr, 4));
+    ASSERT_FALSE(PLIST_ADDRANGE, list_addrange1(&listobj, &arr, 4).code);
     int32_t restored[4] = {0};
     for (int i = 0; i < 4; i++){
         list_get(&listobj, &(restored[i]), i);
-    }
     ASSERT_FALSE(LIST_ADDRANGE1_CHECK, memcmp(&arr, &restored, sizeof(int32_t) * 4));
     CHECK_ALLOCATED
     return 0;
@@ -408,12 +406,9 @@ int ntest_list_set(void){
 	SET_TEST_SUITE_NAME(LIST_SET);
 	list listobj = list_init(1, sizeof(int));
 	int t = 5;
-	indexpair ret = list_set((void*)0, &t, 0);
-	ASSERT_EQ(NTEST_LIST_SET1, ret.code, NULLPTR);
-    ret = list_set(&listobj, (void*)0, 0);
-	ASSERT_EQ(NTEST_LIST_SET2, ret.code, NULLPTR);
-    ret = list_set(&listobj, &t, 10);
-	ASSERT_EQ(NTEST_LIST_SET3, ret.code, ARGBADRANGE);
+	ASSERT_FALSE(NTEST_LIST_SET1, list_set((void*)0, &t, 0).code);
+	ASSERT_FALSE(NTEST_LIST_SET2, list_set(&listobj, (void*)0, 0).code);
+	ASSERT_EQ(NTEST_LIST_SET3, list_set(&listobj, &t, 10).code, ARGBADRANGE);
     list_destroy(&listobj);
 	return 0;
 }
@@ -421,38 +416,30 @@ int ntest_list_set(void){
 int ntest_list_get(void){
 	list listobj = list_init(1, sizeof(int));
 	int restore;
-    indexpair ret = list_get((void*)0, &restore, 0);
-	ASSERT_EQ(NTEST_LIST_GET1, ret.code, NULLPTR);
-    ret = list_get(&listobj, (void*)0, 0);
-	ASSERT_EQ(NTEST_LIST_GET2, ret.code, NULLPTR);
-    ret = list_get(&listobj, &restore, 5);
-	ASSERT_EQ(NTEST_LIST_GET3, ret.code, ARGBADRANGE);
-	CHECK_ALLOCATED
+	ASSERT_FALSE(NTEST_LIST_GET1, list_get((void*)0, &restore, 0).code);
+	ASSERT_FALSE(NTEST_LIST_GET2, list_get(&listobj, (void*)0, 0).code);
+	ASSERT_EQ(NTEST_LIST_GET3, list_get(&listobj, &restore, 5).code, ARGBADRANGE);
+	list_destroy(&listobj);
 	return 0;
 }
 
 int ntest_list_add(void){
 	SET_TEST_SUITE_NAME(LIST_ADD);
 	list listobj = list_init(1, sizeof(int));
-	
 	int t = 5;
-    indexpair ret = list_add((void*)0, &t);
-	ASSERT_EQ(NTEST_LIST_ADD1, ret.code, NULLPTR);
-    ret = list_add(&listobj, (void*)0);
-	ASSERT_EQ(NTEST_LIST_ADD2, ret.code, NULLPTR);
-	CHECK_ALLOCATED
+	ASSERT_FALSE(NTEST_LIST_ADD1, list_add((void*)0, &t).code);
+	ASSERT_FALSE(NTEST_LIST_ADD2, list_add(&listobj, (void*)0).code);
 	return 0;
 }
 
 int ntest_list_addrange1(void){
 	SET_TEST_SUITE_NAME(LIST_ADDRANGE1);
 	list listobj = list_init(1, sizeof(int));
-	
 	int arr[3] = {0};
-	ASSERT_TRUE(NTEST_LIST_ADDRANGE1_1, list_addrange1((void*)0, &arr, 3));
-	ASSERT_TRUE(NTEST_LIST_ADDRANGE1_2, list_addrange1(&listobj, (void*)0, 3));
-	ASSERT_TRUE(NTEST_LIST_ADDRANGE1_3, list_addrange1(&listobj, &arr, 0));
-	CHECK_ALLOCATED
+	ASSERT_EQ(NTEST_LIST_ADDRANGE1_1, list_addrange1((void*)0, &arr, 3).code, NULLPTR);
+	ASSERT_EQ(NTEST_LIST_ADDRANGE1_2, list_addrange1(&listobj, (void*)0, 3).code, NULLPTR);
+	ASSERT_EQ(NTEST_LIST_ADDRANGE1_3, list_addrange1(&listobj, &arr, 0).code, ARGBADRANGE);
+	list_destroy(&listobj);
 	return 0;
 }
 
@@ -489,7 +476,6 @@ int ntest_list_exists(void){
 int ntest_list_find(void){
 	SET_TEST_SUITE_NAME(LIST_FIND);
 	list listobj = list_init(1, sizeof(int));
-	
 	int find = 5, restore = 6;
 	ASSERT_TRUE(NTEST_LIST_FIND1, list_find(0, &find, pcomparer, &restore));
 	ASSERT_TRUE(NTEST_LIST_FIND2, list_find(&listobj, 0, pcomparer, &restore));

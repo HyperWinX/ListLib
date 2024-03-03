@@ -6,10 +6,12 @@
 
 #define ELEMENTCNTINDEX() (list->elementcount == 0 ? 0 : list->elementcount - 1)
 
+indexpair indexpair_default = {NOERR, 0};
+
 //Basic actions
 
 void realloc_if_required(list* listobj, int elements){
-	if (listobj->listsz != listobj->allocated) return;
+	if (listobj->listsz + (listobj->elementsize * elements) > listobj->allocated) return;
 	void* ptr = realloc(listobj->ptr, listobj->allocated + listobj->elementsize * elements);
 	if (!ptr) return;
 	listobj->ptr = ptr;
@@ -32,7 +34,7 @@ struct list list_init(size_t initial_count, size_t elementsize){
 }
 
 indexpair list_get(struct list* list, void* element, uint32_t index){
-	indexpair ret;
+	indexpair ret = indexpair_default;
 	// Protection
 	if (!list || !element){ // Null pointer
 		ret.code = NULLPTR;
@@ -48,7 +50,7 @@ indexpair list_get(struct list* list, void* element, uint32_t index){
 	return ret;
 }                                                 
 indexpair list_set(struct list* list, void* element, uint32_t index){
-	indexpair ret;
+	indexpair ret = indexpair_default;
 	// Protection
 	if (!list || !element){ // Null pointer
 		ret.code = NULLPTR;
@@ -65,7 +67,7 @@ indexpair list_set(struct list* list, void* element, uint32_t index){
 }
 
 indexpair list_destroy(struct list* list){
-	indexpair ret;
+	indexpair ret = indexpair_default;
 	// Protection
 	if (!list){ // Null pointer
 		ret.code = NULLPTR;
@@ -81,7 +83,7 @@ indexpair list_destroy(struct list* list){
 //Extended functionality
 
 indexpair list_add(struct list* list, void* element){
-	indexpair ret;
+	indexpair ret = indexpair_default;
 	// Protection
 	if (!list || !element){ // Null pointer
 		ret.code = NULLPTR;
@@ -97,7 +99,7 @@ indexpair list_add(struct list* list, void* element){
 }
 
 indexpair list_addrange1(struct list* list, void* array, int count){
-	indexpair ret;
+	indexpair ret = indexpair_default;
 	// Protection
 	if (!list || !array){ // Null pointer
 		ret.code = NULLPTR;
@@ -107,16 +109,10 @@ indexpair list_addrange1(struct list* list, void* array, int count){
 		ret.code = ARGBADRANGE;
 		return ret;
 	}
-	int retcode = 0;
-	if (list->allocated < (list->elementcount + count) * list->elementsize){
-		void* newptr = realloc(list->ptr, (list->elementcount + count) * list->elementsize);
-		if (!newptr) return REALLOCFAILURE;
-		list->ptr = newptr;
-		list->allocated = (list->elementcount + count) * list->elementsize;
-	}
+	realloc_if_required(list, count);
 	memcpy(list->ptr + (list->elementsize * list->elementcount), array, list->elementsize * count);
 	list->elementcount += count;
-	return retcode;
+	return ret;
 }
 
 int list_addrange2(struct list* list, struct list* src){
