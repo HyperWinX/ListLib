@@ -135,15 +135,14 @@ int ptest_list_exists(void){
 
 int ptest_list_find(void){
     SET_TEST_SUITE_NAME(LIST_FIND);
-    struct list listobj = list_init(1, sizeof(int32_t));
-    
+    struct list listobj = list_init(1, sizeof(int32_t)); 
     int32_t arr[8] = {4, 7, 1, 9, 123, 5, 8675, 92478};
     list_addrange1(&listobj, &arr, 8);
     int32_t find = 8675;
     int32_t restored = 0;
-    ASSERT_FALSE(PLIST_FIND, list_find(&listobj, &find, pcomparer, &restored));
+    ASSERT_FALSE(PLIST_FIND, list_find(&listobj, &find, pcomparer, &restored).code);
     ASSERT_EQ(PLIST_FIND_CHECK, restored, find);
-    CHECK_ALLOCATED
+    list_destroy(&listobj);
     return 0;
 }
 
@@ -474,12 +473,11 @@ int ntest_list_find(void){
 	SET_TEST_SUITE_NAME(LIST_FIND);
 	list listobj = list_init(1, sizeof(int));
 	int find = 5, restore = 6;
-	ASSERT_TRUE(NTEST_LIST_FIND1, list_find(0, &find, pcomparer, &restore));
-	ASSERT_TRUE(NTEST_LIST_FIND2, list_find(&listobj, 0, pcomparer, &restore));
-	ASSERT_TRUE(NTEST_LIST_FIND3, list_find(&listobj, &find, 0, &restore));
-	ASSERT_TRUE(NTEST_LIST_FIND4, list_find(&listobj, &find, pcomparer, 0));
-	ASSERT_TRUE(NTEST_LIST_FIND5, list_find(&listobj, &find, pcomparer, &restore));
-	restore = 10;
+	ASSERT_EQ(NTEST_LIST_FIND1, list_find(0, &find, pcomparer, &restore).code, NULLPTR);
+	ASSERT_EQ(NTEST_LIST_FIND2, list_find(&listobj, 0, pcomparer, &restore).code, NULLPTR);
+	ASSERT_EQ(NTEST_LIST_FIND3, list_find(&listobj, &find, 0, &restore).code, NULLPTR);
+	ASSERT_EQ(NTEST_LIST_FIND4, list_find(&listobj, &find, pcomparer, 0).code, NULLPTR);
+	ASSERT_EQ(NTEST_LIST_FIND5, list_find(&listobj, &find, pcomparer, &restore).code, ITEMNOTFOUND);
 	return 0;
 }
 

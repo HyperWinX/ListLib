@@ -34,7 +34,7 @@ indexpair list_addrange2(struct list* list, struct list* src);
 indexpair list_clear(struct list* list);
 indexpair list_contains(struct list* list, void* element);
 indexpair list_exists(struct list* list, predicate comparer, void* elementtofind);
-signed int list_find(struct list* list, void* elementtofind, predicate comparer, void* item);
+indexpair list_find(struct list* list, void* elementtofind, predicate comparer, void* item);
 uint32_t list_findindex1(struct list* list, uint32_t startindex, uint32_t endindex, predicate comparer, void* elementtofind);
 uint32_t list_findindex2(struct list* list, uint32_t startindex, predicate comparer, void* elementtofind);
 uint32_t list_findindex3(struct list* list, predicate comparer, void* elementtofind);

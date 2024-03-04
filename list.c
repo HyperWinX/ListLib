@@ -158,7 +158,7 @@ indexpair list_contains(struct list* list, void* element){
 indexpair list_exists(struct list* list, predicate comparer, void* elementtofind){
 	indexpair ret = indexpair_default;
 	// Protection
-	if (!list || !comparer ! || !elementtofind){ // Null pointer
+	if (!list || !comparer || !elementtofind){ // Null pointer
 		ret.code = NULLPTR;
 		return ret;
 	}
@@ -169,17 +169,20 @@ indexpair list_exists(struct list* list, predicate comparer, void* elementtofind
 	return ret;
 }
 
-signed int list_find(struct list* list, void* elementtofind, predicate comparer, void* item){
-	if (!list) return NULLPTR;
-	if (!elementtofind) return NULLPTR;
-	if (!comparer) return NULLPTR;
-	if (!item) return NULLPTR;
+indexpair list_find(struct list* list, void* elementtofind, predicate comparer, void* item){
+	indexpair ret = indexpair_default;
+	// Protection
+	if (!list || !elementtofind || !comparer || !item){ // Null pointer
+		ret.code = NULLPTR;
+		return ret;
+	}
 	for (uint32_t i = 0; i < list->elementcount; i++)
 		if (!comparer(list->ptr + (list->elementsize * i), elementtofind)){
 			memcpy(item, list->ptr + (list->elementsize * i), list->elementsize);
-			return NOERR;
+			return ret;
 		}
-	return ITEMNOTFOUND;
+	ret.code = ITEMNOTFOUND;
+	return ret;
 }
 
 uint32_t list_findindex1(struct list* list, uint32_t startindex, uint32_t endindex, predicate comparer, void* elementtofind){
