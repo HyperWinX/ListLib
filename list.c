@@ -109,51 +109,64 @@ indexpair list_addrange1(struct list* list, void* array, int count){
 		ret.code = ARGBADRANGE;
 		return ret;
 	}
+	// Main code
 	realloc_if_required(list, count);
 	memcpy(list->ptr + (list->elementsize * list->elementcount), array, list->elementsize * count);
 	list->elementcount += count;
 	return ret;
 }
 
-int list_addrange2(struct list* list, struct list* src){
-	if (!list) return NULLPTR;
-	if (!src) return NULLPTR;
-	int retcode = 0;
-	if (list->allocated - list->listsz < src->listsz){
-		void* newptr = realloc(list->ptr, list->listsz + src->listsz);
-		if (!newptr) return REALLOCFAILURE;
-		list->ptr = newptr;
-		list->allocated = list->listsz + src->listsz;
+indexpair list_addrange2(struct list* list, struct list* src){
+	indexpair ret = indexpair_default;
+	// Protection
+	if (!list || !src){ // Null pointer
+		ret.code = NULLPTR;
+		return ret;
 	}
+	// Main code
+	realloc_if_required(list, src->elementcount);
 	memcpy(list->ptr + (list->elementsize * list->elementcount), src->ptr, src->listsz);
 	list->elementcount += src->elementcount;
-	return retcode;
+	return ret;
 }
 
-int list_clear(struct list* list){
-	if (!list) return NULLPTR;
+indexpair list_clear(struct list* list){
+	indexpair ret = indexpair_default;
+	if (!list){
+		ret.code = NULLPTR;
+		return ret;
+	}
 	list->elementcount = 0;
 	list->listsz = 0;
-	return NOERR;
+	return ret;
 }
 
-signed int list_contains(struct list* list, void* element){
-	if (!list) return NULLPTR;
-	if (!element) return NULLPTR;
-	for (uint32_t i = 0; i < list->elementcount; i++)
-		if (!memcmp(list->ptr + (list->elementsize * i), element, list->elementsize)) return 0;
-	return ITEMNOTFOUND;
-}
-
-signed int list_exists(struct list* list, predicate comparer, void* elementtofind){
-	if (!list) return NULLPTR;
-	if (!comparer) return NULLPTR;
-	if (!elementtofind) return NULLPTR;
-	for (uint32_t i = 0; i < list->elementcount; i++){
-		int retcode = comparer(list->ptr + (list->elementsize * i), elementtofind);
-		if (!retcode) return retcode;
+indexpair list_contains(struct list* list, void* element){
+	indexpair ret = indexpair_default;
+	// Protection
+	if (!list || !element){ // Null pointer
+		ret.code = NULLPTR;
+		return ret;
 	}
-	return ITEMNOTFOUND;
+	// Main code
+	for (uint32_t i = 0; i < list->elementcount; i++)
+		if (!memcmp(list->ptr + (list->elementsize * i), element, list->elementsize)) return ret;
+	ret.code = ITEMNOTFOUND;
+	return ret;
+}
+
+indexpair list_exists(struct list* list, predicate comparer, void* elementtofind){
+	indexpair ret = indexpair_default;
+	// Protection
+	if (!list || !comparer ! || !elementtofind){ // Null pointer
+		ret.code = NULLPTR;
+		return ret;
+	}
+	// Main code
+	for (uint32_t i = 0; i < list->elementcount; i++)
+		if (!comparer(list->ptr + (list->elementsize * i), elementtofind)) return ret;
+	ret.code = ITEMNOTFOUND;
+	return ret;
 }
 
 signed int list_find(struct list* list, void* elementtofind, predicate comparer, void* item){
