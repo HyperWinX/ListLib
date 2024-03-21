@@ -1,13 +1,17 @@
 #pragma once
 
-#define ARGBADRANGE -2
-#define ITEMNOTFOUND -1
-#define NOERR 0
-#define NULLINITSIZE 1
-#define ALLOCFAILURE 2
-#define REALLOCFAILURE 3
-#define INDEXOUTOFRANGE 4
-#define NULLPTR 5
+#include <stdint.h>
+
+typedef enum errcode_t{
+		ARGBADRANGE=-2,
+		ITEMNOTFOUND=-1,
+		NOERR=0,
+		NULLINITSIZE=1,
+		ALLOCFAILURE=2,
+		REALLOCFAILURE=3,
+		INDEXOUTOFRANGE=4,
+		NULLPTR=5
+} errcode_t;
 
 typedef struct list{
 	void* ptr;
@@ -18,7 +22,7 @@ typedef struct list{
 } list;
 
 typedef struct indexpair{
-	int32_t code;
+	errcode_t code;
 	uint32_t index;
 } indexpair;
 
