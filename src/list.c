@@ -11,12 +11,13 @@ indexpair indexpair_default = {NOERR, 0};
 
 //Basic actions
 
-void realloc_if_required(list* listobj, int elements){
-	if (listobj->listsz + (listobj->elementsize * elements) <= listobj->allocated) return;
+errcode_t realloc_if_required(list* listobj, int elements){
+	if (listobj->listsz + (listobj->elementsize * elements) <= listobj->allocated) return NOERR;
 	void* ptr = realloc(listobj->ptr, listobj->allocated + listobj->elementsize * elements);
-	if (!ptr) return;
+	if (!ptr) return REALLOCFAILURE;
 	listobj->ptr = ptr;
 	listobj->allocated += listobj->elementsize * elements;
+	return NOERR;
 }
 
 struct list list_init(size_t initial_count, size_t elementsize){
@@ -91,7 +92,10 @@ indexpair list_add(struct list* list, void* element){
 		return ret;
 	}
 	// Main code
-	realloc_if_required(list, 4);
+	if ((int)realloc_if_required(list, 4)){
+			ret.code = REALLOCFAILURE;
+			return ret;
+	}
 	memcpy(list->ptr + (list->elementsize * list->elementcount), element, list->elementsize);
 	list->elementcount++;
 	list->listsz += list->elementsize;
@@ -111,7 +115,10 @@ indexpair list_addrange1(struct list* list, void* array, int count){
 		return ret;
 	}
 	// Main code
-	realloc_if_required(list, count);
+	if ((int)realloc_if_required(list, count)){
+			ret.code = REALLOCFAILURE;
+			return ret;
+	}
 	memcpy(list->ptr + (list->elementsize * list->elementcount), array, list->elementsize * count);
 	list->elementcount += count;
 	return ret;
@@ -125,7 +132,10 @@ indexpair list_addrange2(struct list* list, struct list* src){
 		return ret;
 	}
 	// Main code
-	realloc_if_required(list, src->elementcount);
+	if ((int)realloc_if_required(list, src->elementcount)){
+			ret.code = REALLOCFAILURE;
+			return ret;
+	}
 	memcpy(list->ptr + (list->elementsize * list->elementcount), src->ptr, src->listsz);
 	list->elementcount += src->elementcount;
 	return ret;
@@ -194,7 +204,6 @@ indexpair list_findindex1(struct list* list, uint32_t startindex, uint32_t endin
 		return ret;
 	}
 	else if (startindex > ELEMENTCNTINDEX() ||
-	    	 startindex < 0 ||
 	    	 startindex > endindex){ // Incorrect indexes
 		ret.code = ARGBADRANGE;
 		return ret;
@@ -216,8 +225,7 @@ indexpair list_findindex2(struct list* list, uint32_t startindex, predicate comp
 		ret.code = NULLPTR;
 		return ret;
 	}
-	else if (startindex > ELEMENTCNTINDEX() ||
-	    	 startindex < 0){ // Incorrect indexes
+	else if (startindex > ELEMENTCNTINDEX()){ // Incorrect indexes
 		ret.code = ARGBADRANGE;
 		return ret;
 	}
@@ -273,7 +281,6 @@ indexpair list_findlastindex1(struct list* list, uint32_t startindex, uint32_t e
 		return ret;
 	}
 	if (startindex > ELEMENTCNTINDEX() ||
-	    startindex < 0 ||
 	    startindex > endindex){ // Incorrect indexes
 			ret.code = ARGBADRANGE;
 			return ret;
@@ -295,8 +302,7 @@ indexpair list_findlastindex2(struct list* list, uint32_t startindex, predicate 
 		ret.code = NULLPTR;
 		return ret;
 	}
-	if (startindex > ELEMENTCNTINDEX() ||
-	    startindex < 0){ // Incorrect indexes
+	if (startindex > ELEMENTCNTINDEX()){ // Incorrect indexes
 			ret.code = ARGBADRANGE;
 			return ret;
 	}
@@ -333,7 +339,7 @@ indexpair list_foreach(struct list* list, void (*action)(void*)){
 		return ret;
 	}
 	// Main code
-	for (int i = 0; i < list->elementcount; i++)
+	for (uint32_t i = 0; i < list->elementcount; i++)
 		(*action)(list->ptr + (list->elementsize * i));
 	return ret;
 }
@@ -412,7 +418,10 @@ indexpair list_insert(struct list* list, void* element, uint32_t index){
 		return ret;
 	}
 	// Main code
-	realloc_if_required(list, 4);
+	if ((int)realloc_if_required(list, 4)){
+			ret.code = REALLOCFAILURE;
+			return ret;
+	}
 	for (uint32_t i = list->elementcount - 1; i >= index; i--)
 		memcpy(list->ptr + (list->elementsize * (i + 1)), list->ptr + (list->elementsize * i), list->elementsize);
 	memcpy(list->ptr + (list->elementsize * index), element, list->elementsize);

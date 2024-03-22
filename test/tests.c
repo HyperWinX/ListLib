@@ -3,9 +3,9 @@
 #include <stdlib.h>
 #include <setjmp.h>
 #include <signal.h>
-#include "list.h"
-#include "tests/tests.h"
-#include "CTestify/ctestify.h"
+#include <list.h>
+#include "testing.h"
+#include "../CTestify/ctestify.h"
 
 jmp_buf sigsegv_restore = {0};
 
