@@ -637,9 +637,10 @@ int ntest_list_removeall(void){
 
 int ntest_list_removeat(void){
     SET_TEST_SUITE_NAME(LIST_REMOVEAT);
-    list listobj;
+    list listobj = list_init(1, sizeof(int));
     ASSERT_EQ(NTEST_LIST_REMOVEAT1, list_removeat(0, 0).code, NULLPTR);
     ASSERT_EQ(NTEST_LIST_REMOVEAT2, list_removeat(&listobj, 5).code, ARGBADRANGE);
+	list_destroy(&listobj);
     return 0;
 }
 
